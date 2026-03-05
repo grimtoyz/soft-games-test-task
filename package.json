@@ -1,5 +1,5 @@
 {
-  "name": "pixi7-game",
+  "name": "Softgames Test Assignment",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,12 +8,13 @@
     "preview": "vite preview",
     "format": "prettier --write ."
   },
-  "dependencies": {
-    "pixi.js": "^7.0.0"
-  },
   "devDependencies": {
+    "@tsconfig/vite-react": "^7.0.2",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "pixi.js": "^8.16.0"
   }
 }
