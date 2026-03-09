@@ -1,53 +1,58 @@
 import { Assets } from 'pixi.js';
-import {ASSET_BUNDLES} from "../config/assetsManifest";
+import { ASSET_BUNDLES } from '../config/assetsManifest';
+
+type DynamicAsset = {
+	name: string;
+	url: string;
+};
 
 export class AssetLoader {
-	static registeredBundles = new Set<string>();
+	private static registeredBundles = new Set<string>();
+	private static initialized = false;
 
-	static async init() {
-		Object.entries(ASSET_BUNDLES).forEach(([name, bundle]) => {
-			Assets.addBundle(name, bundle);
-			this.registerBundle(name);
+	public static async init(): Promise<void> {
+		if (this.initialized) return;
+
+		Object.entries(ASSET_BUNDLES).forEach(([bundleName, bundleAssets]) => {
+			Assets.addBundle(bundleName, bundleAssets);
+			this.registeredBundles.add(bundleName);
 		});
+
+		this.initialized = true;
 	}
 
-	public static registerBundle(name: string) {
-		this.registeredBundles.add(name);
-	}
-
-	// TODO: replace any with proper data interface
-	public static async addBundle(config: any, bundleName: string): Promise<void> {
+	public static addDynamicBundle(config: DynamicAsset[], bundleName: string): void {
 		const bundle = config.map((asset) => ({
-			alias: `${bundleName}-${asset.name.toLowerCase()}`,
+			alias: this.makeAlias(bundleName, asset.name),
 			src: asset.url,
+			parser: 'loadTextures',
 		}));
 
 		Assets.addBundle(bundleName, bundle);
-		this.registerBundle(bundleName);
-		// debugger
+		this.registeredBundles.add(bundleName);
 	}
 
-	// static async loadBundle(bundle: keyof typeof ASSET_BUNDLES) {
-	// 	return Assets.loadBundle(bundle);
-	// }
-
-	static async preloadAll(onProgress?: (p: number) => void) {
+	public static async preloadAll(onProgress?: (progress: number) => void): Promise<void> {
 		const bundles = Array.from(this.registeredBundles);
-		debugger
 
 		let loaded = 0;
 
-		for (const bundle of bundles) {
-			await Assets.loadBundle(bundle);
+		for (const bundleName of bundles) {
+			await Assets.loadBundle(bundleName);
 
 			loaded++;
 			onProgress?.(loaded / bundles.length);
 		}
-		console.log(Assets)
-		debugger
 	}
 
-	static get<T = any>(key: string): T {
-		return Assets.get(key);
+	public static makeAlias(bundleName: string, rawName: string): string {
+		const normalizedName = rawName
+			.trim()
+			.toLowerCase()
+			.replace(/\s+/g, '-');
+
+		return normalizedName.startsWith(`${bundleName}-`)
+			? normalizedName
+			: `${bundleName}-${normalizedName}`;
 	}
 }
