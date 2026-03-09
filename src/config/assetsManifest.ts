@@ -1,6 +1,6 @@
 export const ASSET_BUNDLES = {
 	ui: {
-		button: '/assets/ui/ui.json',
+		ui: '/assets/ui/ui.json',
 	},
 
 	backgrounds: {
@@ -17,6 +17,7 @@ export const ASSET_BUNDLES = {
 	game: {
 		cards_deck: '/assets/cards/cards.json',
 		fire: '/assets/fire/fire.json',
-		chat_bubble: '/assets/chat/chat_bubble_nineslice.png'
+		// chat_bubble: '/assets/chat/chat_bubble_nineslice_left.png',
+		// avatar_bg: '/assets/chat/avatar_bg.png'
 	}
 } as const;

@@ -1,0 +1,7 @@
+{
+  "baseWidth": 1920,
+  "baseHeight": 1080,
+  "maxDPR": 2,
+  "roundPixels": true,
+  "chatURL": "https://private-624120-softgamesassignment.apiary-mock.com/v2/magicwords"
+}

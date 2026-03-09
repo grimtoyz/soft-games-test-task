@@ -1,0 +1,33 @@
+{
+  "chatBubble": {
+    "emojiSize": 50,
+    "maxTextWidth": {
+      "port": 260,
+      "land": 700
+    },
+    "messageOffsetX": {
+      "port": -190,
+      "land": -460
+    },
+    "textOffsetX": 20,
+    "textStyle": {
+      "fontFamily": "DIN Condensed",
+      "fontSize": 40,
+      "fill": "0xffffff",
+      "lineHeight": 50,
+      "breakWords": true
+    }
+  },
+  "chatFeedWindow": {
+    "port": {
+      "width": 500,
+      "height": 916,
+      "offsetY": -16
+    },
+    "land": {
+      "width": 1060,
+      "height": 460,
+      "offsetY": -26
+    }
+  }
+}
