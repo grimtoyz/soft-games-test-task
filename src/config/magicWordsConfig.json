@@ -6,8 +6,14 @@
       "land": 700
     },
     "messageOffsetX": {
-      "port": -190,
-      "land": -460
+      "left": {
+        "port": -190,
+        "land": -460
+      },
+      "right": {
+        "port": 190,
+        "land": 460
+      }
     },
     "textOffsetX": 20,
     "textStyle": {
@@ -16,7 +22,12 @@
       "fill": "0xffffff",
       "lineHeight": 50,
       "breakWords": true
-    }
+    },
+    "avatarEnterDuration": 0.5
+  },
+  "chatStartPointOffsetY": {
+    "port": 400,
+    "land": 200
   },
   "chatFeedWindow": {
     "port": {

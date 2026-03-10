@@ -13,6 +13,15 @@ export class AssetLoader {
 	public static async init(): Promise<void> {
 		if (this.initialized) return;
 
+		await Assets.init({
+			loadOptions: {
+				onError: (error, asset) => {
+					console.warn(`[Global Error Handler] Failed to load: ${asset.src}`);
+				},
+				strategy: 'skip',
+			},
+		});
+
 		Object.entries(ASSET_BUNDLES).forEach(([bundleName, bundleAssets]) => {
 			Assets.addBundle(bundleName, bundleAssets);
 			this.registeredBundles.add(bundleName);
@@ -25,6 +34,7 @@ export class AssetLoader {
 		const bundle = config.map((asset) => ({
 			alias: this.makeAlias(bundleName, asset.name),
 			src: asset.url,
+			missing: 'missing_image.png',
 			parser: 'loadTextures',
 		}));
 
