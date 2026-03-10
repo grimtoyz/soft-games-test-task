@@ -25,15 +25,23 @@ interface IAvatarData {
 export class ChatFeed extends Container {
 	private _messages: ChatMessage[];
 	private _chatScreenMask: Sprite;
+	private _scrollContainer: Container;
 	private _chatFeedContainer: Container;
 	private _isPortrait: boolean;
 	private _resizeModel: ResizeModel;
 	private _currentFeedLengthPort: number;
 	private _currentFeedLengthLand: number;
+	private _scrollTimeline: number;
+	private _feedCurrentPositionPort: number;
+	private _feedCurrentPositionLand: number;
+	private _feedTargetDeltaPort: number;
+	private _feedTargetDeltaLand: number;
+	private _state: {progress: 0};
 
 	constructor(resizeModel: ResizeModel) {
 		super();
 
+		this._state = { progress: 0 }
 		this._resizeModel = resizeModel;
 		this._messages = [];
 		this._currentFeedLengthPort = 0;
@@ -89,7 +97,10 @@ export class ChatFeed extends Container {
 		this.updateMaxWidth(this._resizeModel.isPortrait);
 
 		this._chatFeedContainer.layout.forceUpdate();
+
+		this._state.progress = 0;
 		await messageView.playAnimation();
+		// debugger
 	}
 
 	private _getEmojiTexture(key: string): Texture {
@@ -97,19 +108,41 @@ export class ChatFeed extends Container {
 	}
 
 	public async scroll(): Promise<void> {
-		const state = { progress: 0 };
-		const height = this._chatFeedContainer.height;
-		const timeline = new gsap.timeline({onUpdate: () => {
-			this._chatFeedContainer.position.y =
-				gsap.utils.interpolate(this._chatFeedContainer.y, -height, state.progress);
-		}});
+		this._state = { progress: 0 };
+		// const height = this._chatFeedContainer.height;
+		this._scrollTimeline = new gsap.timeline(
+			{
+				onUpdate: () => this.updateFeedPosition(this._isPortrait)
+			}
+		);
 
-		timeline.to(state, { progress: 1, duration: 1 });
-		return timeline;
+		await this._scrollTimeline.to(this._state, { progress: 1, duration: 1});
+
+		if (this._isPortrait) {
+			this._feedCurrentPositionPort = this._chatFeedContainer.position.y;
+		} else {
+			this._feedCurrentPositionLand = this._chatFeedContainer.position.y;
+		}
+
+		return this._scrollTimeline;
+	}
+
+	public onResize(isPortrait: boolean): void {
+		console.log('IS PORTRAIT =', isPortrait);
+		this._isPortrait = isPortrait;
+	}
+
+	public updateFeedPosition(isPortrait: boolean): void {
+		console.log('update feed, isPort', isPortrait);
+		const { chatFeedWindow } = magicWordsConfig;
+		const viewHeight = isPortrait ? chatFeedWindow.port.height : chatFeedWindow.land.height;
+		console.log('this._chatFeedContainer height', this._chatFeedContainer.height)
+
+		this._chatFeedContainer.position.y = Math.min(0, viewHeight * 0.5 - this._chatFeedContainer.height);
 	}
 
 	public updateMaxWidth(isPortrait: boolean): void {
-		this._isPortrait = isPortrait;
+		// this._isPortrait = isPortrait;
 		const { maxTextWidth, messageOffsetX } = magicWordsConfig.chatBubble;
 		this._messages.forEach(message => {
 			const maxWidth = isPortrait ? maxTextWidth.port : maxTextWidth.land;
