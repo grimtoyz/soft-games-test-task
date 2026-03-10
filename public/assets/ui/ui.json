@@ -2,7 +2,7 @@
 
 "avatar_bg.png":
 {
-	"frame": {"x":4,"y":4,"w":100,"h":100},
+	"frame": {"x":676,"y":230,"w":100,"h":100},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":100},
@@ -10,7 +10,7 @@
 },
 "button_hover.png":
 {
-	"frame": {"x":648,"y":4,"w":260,"h":156},
+	"frame": {"x":4,"y":230,"w":260,"h":156},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":260,"h":156},
@@ -18,7 +18,7 @@
 },
 "button_normal.png":
 {
-	"frame": {"x":380,"y":4,"w":260,"h":155},
+	"frame": {"x":272,"y":230,"w":260,"h":155},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":1,"w":260,"h":155},
@@ -26,15 +26,15 @@
 },
 "button_pressed.png":
 {
-	"frame": {"x":112,"y":4,"w":260,"h":152},
-	"rotated": false,
+	"frame": {"x":1362,"y":4,"w":260,"h":152},
+	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":0,"y":4,"w":260,"h":152},
 	"sourceSize": {"w":260,"h":156}
 },
 "buttons_bg.png":
 {
-	"frame": {"x":4,"y":173,"w":1122,"h":218},
+	"frame": {"x":4,"y":4,"w":1122,"h":218},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":1122,"h":218},
@@ -43,26 +43,42 @@
 "chat_bubble_nineslice_left.png":
 {
 	"frame": {"x":1134,"y":4,"w":220,"h":180},
-	"rotated": true,
+	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":220,"h":180},
 	"sourceSize": {"w":220,"h":180}
 },
 "chat_bubble_nineslice_right.png":
 {
-	"frame": {"x":916,"y":4,"w":210,"h":161},
+	"frame": {"x":1134,"y":192,"w":210,"h":161},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":210,"h":161},
 	"sourceSize": {"w":210,"h":161}
+},
+"missing_avatar.png":
+{
+	"frame": {"x":1352,"y":272,"w":96,"h":113},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":16,"y":15,"w":96,"h":113},
+	"sourceSize": {"w":128,"h":128}
+},
+"missing_image.png":
+{
+	"frame": {"x":540,"y":230,"w":128,"h":128},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
+	"sourceSize": {"w":128,"h":128}
 }},
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.1",
 	"image": "ui.png",
 	"format": "RGBA8888",
-	"size": {"w":1318,"h":395},
+	"size": {"w":1518,"h":390},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:a522f5292c7f125c3366e5fa1b2cf522:4021f3096f4326b31b92cf28c4f60b37:5b04aa198265472a3c5f56958d78e97b$"
+	"smartupdate": "$TexturePacker:SmartUpdate:2f7d52468dbf84d9eaf1ccef74e02578:dfcf9542469ed04a8bc68d0a7b0ee7bb:5b04aa198265472a3c5f56958d78e97b$"
 }
 }
