@@ -32,10 +32,6 @@ export class ChatFeed extends Container {
 	private _currentFeedLengthPort: number;
 	private _currentFeedLengthLand: number;
 	private _scrollTimeline: number;
-	private _feedCurrentPositionPort: number;
-	private _feedCurrentPositionLand: number;
-	private _feedTargetDeltaPort: number;
-	private _feedTargetDeltaLand: number;
 	private _state: {progress: 0};
 
 	constructor(resizeModel: ResizeModel) {
@@ -51,7 +47,13 @@ export class ChatFeed extends Container {
 	}
 
 	private _createView(): void {
+		this._scrollContainer = new Container({
+			label: 'ChatScrollContainer'
+		});
+		this.addChild(this._scrollContainer);
+
 		this._chatFeedContainer = new Container({
+			label: 'ChatFeedFlex',
 			layout: {
 				width: '100%',
 				flexDirection: 'column',
@@ -59,7 +61,7 @@ export class ChatFeed extends Container {
 				gap: '20'
 			}
 		});
-		this.addChild(this._chatFeedContainer);
+		this._scrollContainer.addChild(this._chatFeedContainer);
 
 		this._chatScreenMask = new Graphics();
 		this.addChild(this._chatScreenMask);
@@ -100,7 +102,6 @@ export class ChatFeed extends Container {
 
 		this._state.progress = 0;
 		await messageView.playAnimation();
-		// debugger
 	}
 
 	private _getEmojiTexture(key: string): Texture {
@@ -109,40 +110,29 @@ export class ChatFeed extends Container {
 
 	public async scroll(): Promise<void> {
 		this._state = { progress: 0 };
-		// const height = this._chatFeedContainer.height;
 		this._scrollTimeline = new gsap.timeline(
 			{
 				onUpdate: () => this.updateFeedPosition(this._isPortrait)
 			}
 		);
 
-		await this._scrollTimeline.to(this._state, { progress: 1, duration: 1});
-
-		if (this._isPortrait) {
-			this._feedCurrentPositionPort = this._chatFeedContainer.position.y;
-		} else {
-			this._feedCurrentPositionLand = this._chatFeedContainer.position.y;
-		}
+		this._scrollTimeline.to(this._state, { progress: 1, duration: 1});
 
 		return this._scrollTimeline;
 	}
 
 	public onResize(isPortrait: boolean): void {
-		console.log('IS PORTRAIT =', isPortrait);
 		this._isPortrait = isPortrait;
 	}
 
 	public updateFeedPosition(isPortrait: boolean): void {
-		console.log('update feed, isPort', isPortrait);
 		const { chatFeedWindow } = magicWordsConfig;
 		const viewHeight = isPortrait ? chatFeedWindow.port.height : chatFeedWindow.land.height;
-		console.log('this._chatFeedContainer height', this._chatFeedContainer.height)
 
-		this._chatFeedContainer.position.y = Math.min(0, viewHeight * 0.5 - this._chatFeedContainer.height);
+		this._scrollContainer.position.y = Math.min(0, viewHeight * 0.5 - this._chatFeedContainer.height);
 	}
 
 	public updateMaxWidth(isPortrait: boolean): void {
-		// this._isPortrait = isPortrait;
 		const { maxTextWidth, messageOffsetX } = magicWordsConfig.chatBubble;
 		this._messages.forEach(message => {
 			const maxWidth = isPortrait ? maxTextWidth.port : maxTextWidth.land;
