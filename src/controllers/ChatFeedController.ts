@@ -1,3 +1,4 @@
+import * as PIXI from 'pixi.js';
 import {ChatFeed} from "../view/components/chat/ChatFeed";
 import {ChatModel} from "../models/ChatModel";
 
@@ -7,12 +8,14 @@ interface IMessageData {
 }
 
 export class ChatFeedController {
+	private _app: PIXI.Application;
 	private _view: ChatFeed;
 	private _currentMessageIndex: number;
 	private _messagesToShow: IMessageData[];
 	readonly _chatModel: ChatModel;
 
-	constructor(view: ChatFeed, chatModel: ChatModel) {
+	constructor(app: PIXI.Application, view: ChatFeed, chatModel: ChatModel) {
+		this._app = app;
 		this._view = view;
 		this._chatModel = chatModel;
 		this._currentMessageIndex = 0;
@@ -22,18 +25,32 @@ export class ChatFeedController {
 	public async startDialogue(): Promise<void> {
 		this._messagesToShow = [...this._chatModel.getMessages()];
 
-		// while (this._messagesToShow.length) {
+		while (this._messagesToShow.length) {
 			const message = this._messagesToShow.shift();
 			await this.showMessage(message);
-		// }
+		}
 	}
 
 	private async showMessage(message: IMessageData): Promise<void> {
-		await this._view.addMessage(message);
+		const avatarData = this._chatModel.getAvatarDataByName(message.name);
+
+		this._view.addMessage(message, avatarData);
+		await this._view.scroll();
 	}
 
-	public updateOnResize(isPortrait: boolean): void {
+	public async updateOnResize(isPortrait: boolean): void {
+		this._view.onResize(isPortrait);
 		this._view.updateMaxWidth(isPortrait);
 		this._view.updateMask(isPortrait);
+
+		await this.nextTick();
+
+		this._view.updateFeedPosition(isPortrait);
+	}
+
+	private nextTick(): Promise<void> {
+		return new Promise((resolve) => {
+			this._app.ticker.addOnce(() => resolve());
+		});
 	}
 }

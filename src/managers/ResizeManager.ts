@@ -1,23 +1,31 @@
-import { Application, Container } from 'pixi.js';
+import { Application, Container, EventEmitter } from 'pixi.js';
+import {CONSTANTS} from "../constants/constants";
+import {ResizeModel} from "../models/ResizeModel";
 
 export class ResizeManager {
 	private _resizeObserver: ResizeObserver;
 	private _app: Application;
 	private _container: HTMLElement;
 	private _gameRoot: Container;
+	private _resizeModel: ResizeModel;
 	readonly _baseW: number;
 	readonly _baseH: number;
+	readonly _eventBus: EventEmitter;
 
 	constructor(
 		app: Application,
+		eventBus: EventEmitter,
 		container: HTMLElement,
 		gameRoot: Container,
+		resizeModel: ResizeModel,
 		baseW: number,
 		baseH: number
 	) {
 		this._app = app;
+		this._eventBus = eventBus;
 		this._container = container;
 		this._gameRoot = gameRoot;
+		this._resizeModel = resizeModel;
 		this._baseW = baseW;
 		this._baseH = baseH;
 
@@ -27,7 +35,7 @@ export class ResizeManager {
 		this.resize();
 	}
 
-	private resize(): void {
+	public resize(): void {
 		const w = this._container.clientWidth;
 		const h = this._container.clientHeight;
 		if (w <= 0 || h <= 0) return;
@@ -35,7 +43,8 @@ export class ResizeManager {
 		this._app.renderer.resize(w, h);
 
 		const isPortrait = h >= w;
-		const scale = isPortrait ? h / this._baseH : w / this._baseW;
+		const maxSide = Math.max(this._baseH, this._baseW);
+		const scale = isPortrait ? h / maxSide : w / maxSide;
 
 		this._gameRoot.scale.set(scale);
 
@@ -43,6 +52,9 @@ export class ResizeManager {
 		const viewH = this._baseH * scale;
 
 		this._gameRoot.position.set((w - viewW) / 2, (h - viewH) / 2);
+		this._resizeModel.isPortrait = isPortrait;
+
+		this._eventBus.emit(CONSTANTS.EVENTS.RESIZE, isPortrait)
 	}
 
 	public destroy(): void {

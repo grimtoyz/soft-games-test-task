@@ -1,11 +1,13 @@
 import * as PIXI from 'pixi.js';
 import {Container} from "pixi.js";
 import {CONSTANTS} from "../constants/constants";
-import gameConfig from "../config/gameConfig.json";
+import gameConfig from '../config/gameConfig.json';
+import {ResizeModel} from "../models/ResizeModel";
 
 export class SceneManager {
 	private _world: PIXI.Container;
 	private _eventBus: PIXI.EventEmitter;
+	private _resizeModel: ResizeModel;
 	private _currentScene: PIXI.Container;
 	private _nextScene: PIXI.Container;
 	private _scenes: PIXI.Container[];
@@ -13,9 +15,10 @@ export class SceneManager {
 	readonly _sceneContainer: PIXI.Container;
 	readonly _persistentContainer: PIXI.Container;
 
-	constructor(world: PIXI.Container, eventBus: PIXI.EventEmitter){
+	constructor(world: PIXI.Container, eventBus: PIXI.EventEmitter, resizeModel: ResizeModel){
 		this._world = world;
 		this._eventBus = eventBus;
+		this._resizeModel = resizeModel;
 		this._scenes = [];
 		this._persistentScenes = [];
 
@@ -23,24 +26,24 @@ export class SceneManager {
 		this._world.addChild(this._sceneContainer);
 
 		this._persistentContainer = new Container();
+		this._persistentContainer.layout = {
+			width: '100%',
+			height: '100%'
+		}
 		this._world.addChild(this._persistentContainer);
 
-		// const green = new CardsScene();
-		// this._world.addChild(green);
 		this._subscribe();
 	}
 
 	private _onResizeEvent = (isPortrait: boolean) => {
-		const x = isPortrait ? 540 : 960;
-		const y = isPortrait ? 960 : 540;
-		this._sceneContainer.position.set(960, 540);
+		const { baseWidth, baseHeight} = gameConfig;
+		this._sceneContainer.position.set(baseWidth * 0.5, baseHeight * 0.5);
 
-		if (this._currentScene) {
-			this._currentScene.onResize(isPortrait);
-		}
+		this._scenes.forEach(scene => {
+			scene.onResize(isPortrait);
+		});
 
 		this._persistentScenes.forEach(scene => {
-			console.log('RESIZE PERSISTENT')
 			scene.onResize(isPortrait);
 		})
 	}
@@ -71,15 +74,19 @@ export class SceneManager {
 	public switchSceneTo(sceneToId: string): void {
 		const sceneTo = this._scenes.find((scene) => scene.label === sceneToId);
 
-		if (sceneTo) {
+		if (sceneTo && sceneTo !== this._currentScene) {
 			this._nextScene = sceneTo;
 
 			if (this._currentScene) {
 				this._sceneContainer.removeChild(this._currentScene)
 			}
 
+			this._currentScene.onExit();
+
 			this._sceneContainer.addChild(sceneTo);
 			this._currentScene = sceneTo;
+
+			this._currentScene.onEnter();
 		}
 	}
 }
