@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>6</int>
         <key>texturePackerVersion</key>
-        <string>7.0.3</string>
+        <string>7.12.0</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -173,6 +173,62 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
+            <key type="filename">cards/10C.png</key>
+            <key type="filename">cards/10D.png</key>
+            <key type="filename">cards/10H.png</key>
+            <key type="filename">cards/10S.png</key>
+            <key type="filename">cards/4H.png</key>
+            <key type="filename">cards/4S.png</key>
+            <key type="filename">cards/5C.png</key>
+            <key type="filename">cards/5D.png</key>
+            <key type="filename">cards/5H.png</key>
+            <key type="filename">cards/5S.png</key>
+            <key type="filename">cards/6C.png</key>
+            <key type="filename">cards/6D.png</key>
+            <key type="filename">cards/6H.png</key>
+            <key type="filename">cards/6S.png</key>
+            <key type="filename">cards/7C.png</key>
+            <key type="filename">cards/7D.png</key>
+            <key type="filename">cards/7H.png</key>
+            <key type="filename">cards/7S.png</key>
+            <key type="filename">cards/8C.png</key>
+            <key type="filename">cards/8D.png</key>
+            <key type="filename">cards/8H.png</key>
+            <key type="filename">cards/8S.png</key>
+            <key type="filename">cards/9C.png</key>
+            <key type="filename">cards/9D.png</key>
+            <key type="filename">cards/9H.png</key>
+            <key type="filename">cards/9S.png</key>
+            <key type="filename">cards/AC.png</key>
+            <key type="filename">cards/AD.png</key>
+            <key type="filename">cards/AH.png</key>
+            <key type="filename">cards/AS.png</key>
+            <key type="filename">cards/JC.png</key>
+            <key type="filename">cards/JD.png</key>
+            <key type="filename">cards/JH.png</key>
+            <key type="filename">cards/JS.png</key>
+            <key type="filename">cards/KC.png</key>
+            <key type="filename">cards/KD.png</key>
+            <key type="filename">cards/KH.png</key>
+            <key type="filename">cards/KS.png</key>
+            <key type="filename">cards/QC.png</key>
+            <key type="filename">cards/QD.png</key>
+            <key type="filename">cards/QH.png</key>
+            <key type="filename">cards/QS.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>33,50,65,100</rect>
+                <key>scale9Paddings</key>
+                <rect>33,50,65,100</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">cards/2C.png</key>
             <key type="filename">cards/2D.png</key>
             <key type="filename">cards/2H.png</key>

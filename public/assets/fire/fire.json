@@ -1,20 +1,44 @@
 {"frames": {
 
+"fire_particle_type_b.png":
+{
+	"frame": {"x":1,"y":1,"w":514,"h":954},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":0,"w":514,"h":954},
+	"sourceSize": {"w":517,"h":954}
+},
+"fire_particle_type_с.png":
+{
+	"frame": {"x":1,"y":517,"w":508,"h":870},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":30,"y":59,"w":508,"h":870},
+	"sourceSize": {"w":548,"h":929}
+},
 "fireplace.png":
 {
-	"frame": {"x":1,"y":1,"w":677,"h":426},
-	"rotated": false,
+	"frame": {"x":511,"y":517,"w":677,"h":426},
+	"rotated": true,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":677,"h":426},
 	"sourceSize": {"w":677,"h":426}
+},
+"smoke_type_a.png":
+{
+	"frame": {"x":511,"y":1196,"w":184,"h":177},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":35,"y":38,"w":184,"h":177},
+	"sourceSize": {"w":256,"h":256}
 }},
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.1",
 	"image": "fire.png",
 	"format": "RGBA8888",
-	"size": {"w":679,"h":428},
+	"size": {"w":956,"h":1388},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:eedb7e692f6fc7dc6940f7b64f38af32:3a0288272ffb76fabbb06ace44f393b5:fe85b518f19a08db92d89ee48ba7169f$"
+	"smartupdate": "$TexturePacker:SmartUpdate:f580efb8ab43134654266da5a7a60d8f:25ab1aa2c7e3f516239f95883875f091:fe85b518f19a08db92d89ee48ba7169f$"
 }
 }
