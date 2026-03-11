@@ -8,7 +8,7 @@ import {
 import gsap from 'gsap';
 import {parseMessageToTokens} from "../../../helpers/text/ChatTokensParser";
 import {layoutInlineTokens} from "../../../helpers/text/LayoutHelper";
-import magicWordsConfig from "../../../config/magicWordsConfig.json";
+import magicWordsConfig from "../../../config/scenes/magicWordsConfig.json";
 
 type EmojiTextureMap = Record<string, Texture>;
 

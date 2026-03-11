@@ -8,7 +8,7 @@ import {
 } from 'pixi.js';
 import gsap from "gsap";
 import {ChatMessage} from "./ChatMessage";
-import magicWordsConfig from "../../../config/magicWordsConfig.json";
+import magicWordsConfig from "../../../config/scenes/magicWordsConfig.json";
 import {ResizeModel} from "../../../models/ResizeModel";
 
 interface IMessageData {
@@ -66,6 +66,15 @@ export class ChatFeed extends Container {
 		this._chatScreenMask = new Graphics();
 		this.addChild(this._chatScreenMask);
 		this.mask = this._chatScreenMask;
+	}
+
+	public reset(): void {
+		if (this._scrollTimeline) {
+			this._scrollTimeline.kill();
+		}
+
+		this._chatFeedContainer.removeChildren();
+		this._messages = [];
 	}
 
 	public async addMessage(message: IMessageData, avatarData: IAvatarData): Promise<void> {

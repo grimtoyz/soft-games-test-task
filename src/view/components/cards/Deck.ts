@@ -4,7 +4,7 @@ import aceOfShadows from "../../../config/scenes/aceOfShadowsConfig.json";
 
 
 export class Deck extends PIXI.Container {
-	readonly _cards: Card[];
+	private _cards: Card[];
 
 	constructor() {
 		super();
@@ -17,6 +17,13 @@ export class Deck extends PIXI.Container {
 		const y = -this.children.length * 0.2;
 
 		return new PIXI.Point(x, y);
+	}
+
+	public addCard(card: Card): void {
+		this._cards.push(card);
+		if (card.parent !== this) {
+			this.reparentChild(card);
+		}
 	}
 
 	public createCards(amount: number): void {
@@ -32,6 +39,18 @@ export class Deck extends PIXI.Container {
 
 			this._cards.push(card);
 		}
+	}
+
+	public reset(): void {
+		this._cards = [];
+	}
+
+	public rearrange(): void {
+		this._cards.forEach((card, index) => {
+			card.x = index * 0.2;
+			card.y = -index * 0.2;
+			card.scale.set(1);
+		})
 	}
 
 	public getTopCard(): Card {
