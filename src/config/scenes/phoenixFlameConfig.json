@@ -1,0 +1,14 @@
+{
+  "emitter": {
+    "maxParticles": 10
+  },
+  "fireplace": {
+    "position": {
+      "x": 0,
+      "y": 300
+    },
+    "scale": {
+      
+    }
+  }
+}

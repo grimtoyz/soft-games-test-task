@@ -6,9 +6,12 @@ export abstract class GameScene extends PIXI.Container {
 		this.label = name;
 	}
 
-	onEnter();
+	public onEnter();
 
-	onExit();
+	public onExit();
+
+	public update(dt: number): void {
+	}
 
 	onResize(isPortrait: boolean);
 }

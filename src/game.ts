@@ -65,6 +65,7 @@ export class Game {
 		const chatData = await this._loadChatData(gameConfig.chatURL);
 		this._chatModel = new ChatModel();
 		this._chatModel.setMessages(chatData.dialogue);
+		this._chatModel.setAvatars(chatData.avatars);
 
 		await AssetLoader.addDynamicBundle(chatData.emojies, 'emojies');
 		await AssetLoader.addDynamicBundle(chatData.avatars, 'avatars');
@@ -88,7 +89,7 @@ export class Game {
 		const { baseWidth, baseHeight } = gameConfig;
 
 		this._resizeModel = new ResizeModel();
-		this._sceneManager = new SceneManager(this._world, this._eventBus, this._resizeModel);
+		this._sceneManager = new SceneManager(this._app, this._world, this._eventBus, this._resizeModel);
 
 		this._resizeManager = new ResizeManager(
 			this._app,
@@ -106,13 +107,13 @@ export class Game {
 		const ui = new PersistentUI(this._app, this._eventBus, this._world, sceneTitles, this.onUIInteract.bind(this));
 		this._sceneManager.addPersistentScene(ui);
 
-		const cardsScene = new CardsScene(SCENES.CARDS);
+		const cardsScene = new CardsScene(SCENES.CARDS, this._app, this._resizeModel);
 		this._sceneManager.addScene(cardsScene);
 
-		const chatScene = new ChatScene(SCENES.CHAT, this._chatModel, this._resizeModel);
+		const chatScene = new ChatScene(SCENES.CHAT, this._app, this._chatModel, this._resizeModel);
 		this._sceneManager.addScene(chatScene);
 
-		const fireScene = new FireScene(SCENES.FIRE);
+		const fireScene = new FireScene(SCENES.FIRE, this._app);
 		this._sceneManager.addScene(fireScene);
 	}
 

@@ -5,17 +5,20 @@ import gameConfig from '../config/gameConfig.json';
 import {ResizeModel} from "../models/ResizeModel";
 
 export class SceneManager {
+	private _app: PIXI.Application;
 	private _world: PIXI.Container;
 	private _eventBus: PIXI.EventEmitter;
 	private _resizeModel: ResizeModel;
 	private _currentScene: PIXI.Container;
 	private _nextScene: PIXI.Container;
 	private _scenes: PIXI.Container[];
+	private _ticker!: (ticker: PIXI.Ticker) => void;
 	private _persistentScenes: PIXI.Container[];
 	readonly _sceneContainer: PIXI.Container;
 	readonly _persistentContainer: PIXI.Container;
 
-	constructor(world: PIXI.Container, eventBus: PIXI.EventEmitter, resizeModel: ResizeModel){
+	constructor(app: PIXI.Application, world: PIXI.Container, eventBus: PIXI.EventEmitter, resizeModel: ResizeModel){
+		this._app = app;
 		this._world = world;
 		this._eventBus = eventBus;
 		this._resizeModel = resizeModel;
@@ -31,6 +34,12 @@ export class SceneManager {
 			height: '100%'
 		}
 		this._world.addChild(this._persistentContainer);
+
+		this._ticker = (ticker) => {
+			this._update(ticker.deltaMS / 1000);
+		};
+
+		this._app.ticker.add(this._ticker);
 
 		this._subscribe();
 	}
@@ -62,6 +71,7 @@ export class SceneManager {
 		if (!this._currentScene) {
 			this._currentScene = scene;
 			this._sceneContainer.addChild(scene);
+			this._currentScene.onEnter();
 		}
 	}
 
@@ -87,6 +97,12 @@ export class SceneManager {
 			this._currentScene = sceneTo;
 
 			this._currentScene.onEnter();
+		}
+	}
+
+	private _update(dt: number): void {
+		if (this._currentScene) {
+			this._currentScene.update(dt);
 		}
 	}
 }

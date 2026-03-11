@@ -67,6 +67,9 @@ export class CardsScene extends GameScene {
 		this._cardsController.resetCards();
 	}
 
+	public update(delta: number): void {
+	}
+
 	public onResize(isPortrait: boolean): void {
 		this._decks.forEach(deck => {
 			const deckConfig = this._config.decks.find((deckConfig) => deckConfig.name === deck.label);

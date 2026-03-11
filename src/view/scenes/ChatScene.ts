@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import magicWordsConfig from "../../config/magicWordsConfig.json";
+import magicWordsConfig from "../../config/scenes/magicWordsConfig.json";
 import {GameScene} from "./GameScene";
 import {ChatMessage} from "../components/chat/ChatMessage";
 import {ChatModel} from "../../models/ChatModel";
@@ -39,10 +39,13 @@ export class ChatScene extends GameScene{
 	}
 
 	public override onExit(): void {
+		this._chatController.resetDialogue();
+	}
+
+	public update(delta: number): void {
 	}
 
 	public override onResize(isPortrait: boolean): void {
-		const { maxTextWidth } = magicWordsConfig.chatBubble;
 		const currentTexture = isPortrait ? 'phone_bg_port' : 'phone_bg_land';
 
 		this._bg.texture = PIXI.Assets.get(currentTexture);

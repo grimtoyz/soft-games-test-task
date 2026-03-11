@@ -218,6 +218,36 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">fire/glow.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>256,147,512,293</rect>
+                <key>scale9Paddings</key>
+                <rect>256,147,512,293</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">fire/glow_circle.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>197,175,393,349</rect>
+                <key>scale9Paddings</key>
+                <rect>197,175,393,349</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">fire/smoke_type_a.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>

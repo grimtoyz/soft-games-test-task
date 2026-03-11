@@ -7,6 +7,7 @@ import {Fire} from "../components/fire/Fire";
 export class FireScene extends GameScene{
 	private readonly _app: PIXI.Application;
 	private readonly _bg: PIXI.Sprite;
+	private _fire: Fire;
 
 	constructor(name: string, app: PIXI.Application) {
 		super(name);
@@ -22,17 +23,26 @@ export class FireScene extends GameScene{
 	}
 
 	public _createFire(): void {
-		const fire = new Fire(this._app);
-		this.addChild(fire)
+		this._fire = new Fire(this._app);
+		this.addChild(this._fire)
 
 		const {x,y} = fireSceneConfig.fireplace.position;
-		fire.position.set(x,y);
+		this._fire.position.set(x,y);
 	}
 
 	public onEnter(): void {
+		this._ticker = (ticker) => {
+			this._fire.update(ticker.deltaMS / 1000);
+		};
+
+		this._app.ticker.add(this._emitterTicker);
 	}
 
 	public onExit(): void {
+	}
+
+	public update(dt: number): void {
+		this._fire.update(dt);
 	}
 
 	public onResize(isPortrait: boolean): void {

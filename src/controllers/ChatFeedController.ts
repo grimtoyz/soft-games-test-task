@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import {ChatFeed} from "../view/components/chat/ChatFeed";
 import {ChatModel} from "../models/ChatModel";
+import {Utils} from "../utils/Utils";
 
 interface IMessageData {
 	name: string;
@@ -10,7 +11,6 @@ interface IMessageData {
 export class ChatFeedController {
 	private _app: PIXI.Application;
 	private _view: ChatFeed;
-	private _currentMessageIndex: number;
 	private _messagesToShow: IMessageData[];
 	readonly _chatModel: ChatModel;
 
@@ -18,7 +18,6 @@ export class ChatFeedController {
 		this._app = app;
 		this._view = view;
 		this._chatModel = chatModel;
-		this._currentMessageIndex = 0;
 		this._messagesToShow = [];
 	}
 
@@ -29,6 +28,11 @@ export class ChatFeedController {
 			const message = this._messagesToShow.shift();
 			await this.showMessage(message);
 		}
+	}
+
+	public resetDialogue(): void {
+		this._messagesToShow = [];
+		this._view.reset();
 	}
 
 	private async showMessage(message: IMessageData): Promise<void> {
@@ -43,14 +47,8 @@ export class ChatFeedController {
 		this._view.updateMaxWidth(isPortrait);
 		this._view.updateMask(isPortrait);
 
-		await this.nextTick();
+		await Utils.nextTick(this._app);
 
 		this._view.updateFeedPosition(isPortrait);
-	}
-
-	private nextTick(): Promise<void> {
-		return new Promise((resolve) => {
-			this._app.ticker.addOnce(() => resolve());
-		});
 	}
 }
