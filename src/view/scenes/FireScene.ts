@@ -1,30 +1,32 @@
 import * as PIXI from 'pixi.js';
-import fireSceneConfig from "../../config/fireSceneConfig.json";
+import fireSceneConfig from "../../config/scenes/phoenixFlameConfig.json";
 import {GameScene} from "./GameScene";
 import {Sprite} from 'pixi.js';
+import {Fire} from "../components/fire/Fire";
 
 export class FireScene extends GameScene{
-	private _fire: PIXI.Sprite;
-	readonly _bg: PIXI.Sprite;
+	private readonly _app: PIXI.Application;
+	private readonly _bg: PIXI.Sprite;
 
-	constructor(name: string) {
+	constructor(name: string, app: PIXI.Application) {
 		super(name);
+
+		this._app = app;
 
 		this._bg = Sprite.from('brown_bg');
 		this._bg.anchor.set(0.5);
 		this._bg.scale.set(2);
 
 		this.addChild(this._bg);
-		this._createFireplace();
+		this._createFire();
 	}
 
-	public _createFireplace(): void {
-		this._fire = Sprite.from('fireplace.png')
-		this._fire.anchor.set(0.5, 0.8);
-		const {x,y} = fireSceneConfig.fireplace.position;
-		this._fire.position.set(x,y);
+	public _createFire(): void {
+		const fire = new Fire(this._app);
+		this.addChild(fire)
 
-		this.addChild(this._fire);
+		const {x,y} = fireSceneConfig.fireplace.position;
+		fire.position.set(x,y);
 	}
 
 	public onEnter(): void {
