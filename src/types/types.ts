@@ -1,5 +1,8 @@
 import * as PIXI from 'pixi.js';
 import type { GameScene } from '../view/scenes/GameScene.ts';
+import { AVATAR_POSITIONS } from '../enums/enums.ts';
+
+export type AvatarPosition = (typeof AVATAR_POSITIONS)[keyof typeof AVATAR_POSITIONS];
 
 export type DialogData = {
   name: string;
@@ -14,7 +17,7 @@ export type EmojiData = {
 export type AvatarData = {
   name: string;
   url: string;
-  position: 'left' | 'right';
+  position: AvatarPosition;
 };
 
 export type ChatData = {

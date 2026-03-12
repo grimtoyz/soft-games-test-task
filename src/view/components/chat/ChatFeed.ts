@@ -4,6 +4,7 @@ import { ChatMessage } from './ChatMessage';
 import magicWordsConfig from '../../../config/scenes/magicWordsConfig.json';
 import { ResizeModel } from '../../../models/ResizeModel';
 import { getAvatarTextureName } from '../../../helpers/text/TextureNameHelper';
+import { AVATAR_POSITIONS, type AvatarPosition } from '../../../enums/enums.ts';
 
 interface IMessageData {
   name: string;
@@ -70,7 +71,7 @@ export class ChatFeed extends Container {
   public async addMessage(message: IMessageData, avatarData: IAvatarData): Promise<void> {
     const { textStyle, maxTextWidth, emojiSize, textOffsetX } = magicWordsConfig.chatBubble;
     const { name, text } = message;
-    const avatarPosition: 'left' | 'right' = avatarData?.position ?? 'left';
+    const avatarPosition: AvatarPosition = avatarData?.position ?? AVATAR_POSITIONS.LEFT;
     const chatBubbleTextureName = `chat_bubble_nineslice_${avatarPosition}.png`;
     const messageView = new ChatMessage({
       avatarTexture: Assets.get(getAvatarTextureName(name)),
