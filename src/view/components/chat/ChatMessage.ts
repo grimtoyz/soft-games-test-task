@@ -10,14 +10,11 @@ import {parseMessageToTokens} from "../../../helpers/text/ChatTokensParser";
 import {layoutInlineTokens} from "../../../helpers/text/LayoutHelper";
 import magicWordsConfig from "../../../config/scenes/magicWordsConfig.json";
 
-type EmojiTextureMap = Record<string, Texture>;
-
 type ChatMessageViewOptions = {
 	avatarTexture: Texture;
 	avatarPosition: 'left' | 'right';
 	bubbleTexture: Texture;
 	message: string;
-	emojiTextures: EmojiTextureMap;
 
 	maxTextWidth?: number;
 	textOffsetX?: number;
@@ -57,8 +54,6 @@ export class ChatMessage extends Container {
 		super();
 
 		this._avatarPosition = options.avatarPosition;
-
-		this.emojiTextures = options.emojiTextures;
 
 		this._maxTextWidth = options.maxTextWidth ?? 100;
 		this._textOffsetX = options.textOffsetX ?? 0;
@@ -122,7 +117,6 @@ export class ChatMessage extends Container {
 			tokens,
 			maxWidth: this._maxTextWidth,
 			textStyle: this.textStyle,
-			emojiTextures: this.emojiTextures,
 			emojiSize: this.emojiSize,
 		});
 

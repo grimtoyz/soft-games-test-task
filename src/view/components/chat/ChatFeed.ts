@@ -4,12 +4,12 @@ import {
 	TextStyle,
 	Graphics,
 	Assets,
-	Texture
 } from 'pixi.js';
 import gsap from "gsap";
 import {ChatMessage} from "./ChatMessage";
 import magicWordsConfig from "../../../config/scenes/magicWordsConfig.json";
 import {ResizeModel} from "../../../models/ResizeModel";
+import {getAvatarTextureName} from "../../../helpers/text/TextureNameHelper";
 
 interface IMessageData {
 	name: string;
@@ -83,18 +83,9 @@ export class ChatFeed extends Container {
 		const avatarPosition = avatarData?.position ?? 'left';
 		const chatBubbleTextureName = `chat_bubble_nineslice_${avatarPosition}.png`;
 		const messageView = new ChatMessage({
-			avatarTexture: Assets.get(`avatars-${name.toLowerCase()}`) || Assets.get(`missing_avatar.png`),
+			avatarTexture: Assets.get(getAvatarTextureName(name)),
 			avatarPosition,
 			bubbleTexture: Assets.get(chatBubbleTextureName),
-			emojiTextures: {
-				sad: this._getEmojiTexture('emojies-sad'),
-				neutral: this._getEmojiTexture('emojies-neutral'),
-				satisfied: this._getEmojiTexture('emojies-satisfied'),
-				laughing: this._getEmojiTexture('emojies-laughing'),
-				affirmative: this._getEmojiTexture('emojies-affirmative'),
-				satisfied: this._getEmojiTexture('emojies-satisfied'),
-				intrigued: this._getEmojiTexture('emojies-intrigued'),
-			},
 			textStyle: new TextStyle(textStyle),
 			message: text,
 			maxTextWidth: maxTextWidth.land,
@@ -111,10 +102,6 @@ export class ChatFeed extends Container {
 
 		this._state.progress = 0;
 		await messageView.playAnimation();
-	}
-
-	private _getEmojiTexture(key: string): Texture {
-		return Assets.get(key) || Assets.get('missing_image.png');
 	}
 
 	public async scroll(): Promise<void> {

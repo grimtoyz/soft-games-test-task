@@ -3,17 +3,17 @@ import {
 	Text,
 	CanvasTextMetrics,
 	TextStyle,
-	Texture,
+	Assets
 } from 'pixi.js';
+import {getEmojiTextureName} from "./TextureNameHelper";
 
 export function layoutInlineTokens(params: {
 	tokens: Token[];
 	maxWidth: number;
 	textStyle: TextStyle;
-	emojiTextures: Record<string, Texture>;
 	emojiSize: number;
 }) {
-	const { tokens, maxWidth, textStyle, emojiTextures, emojiSize } = params;
+	const { tokens, maxWidth, textStyle, emojiSize } = params;
 
 	const items: { displayObject: Text | Sprite }[] = [];
 
@@ -38,7 +38,13 @@ export function layoutInlineTokens(params: {
 		}
 
 		if (token.type === 'emoji') {
-			const texture = emojiTextures[token.value];
+			const textureName = getEmojiTextureName(token.value);
+			let texture = Assets.get(textureName);
+			if (!texture) {
+				const textureFallback = Assets.get('missing_image.png');
+			 	Assets.cache.set(textureName, textureFallback);
+				 texture = textureFallback;
+			}
 
 			const width = emojiSize;
 

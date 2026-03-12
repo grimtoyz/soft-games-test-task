@@ -10,6 +10,8 @@ import {FireScene} from "./view/scenes/FireScene";
 import {ChatModel} from "./models/ChatModel";
 import '../styles/fonts.css';
 import {ResizeModel} from "./models/ResizeModel";
+import {getAvatarTextureName} from "./helpers/text/TextureNameHelper";
+import {Assets} from "pixi.js";
 
 const SCENES = {
 	CARDS: 'Ace of Shadows',
@@ -62,15 +64,25 @@ export class Game {
 	private async _loadAssets(): Promise<void> {
 		await AssetLoader.init();
 
+		await AssetLoader.preloadStatic();
+
 		const chatData = await this._loadChatData(gameConfig.chatURL);
 		this._chatModel = new ChatModel();
 		this._chatModel.setMessages(chatData.dialogue);
 		this._chatModel.setAvatars(chatData.avatars);
 
+		await AssetLoader.loadAvatarsSequential(chatData.avatars);
 		await AssetLoader.addDynamicBundle(chatData.emojies, 'emojies');
-		await AssetLoader.addDynamicBundle(chatData.avatars, 'avatars');
 
-		await AssetLoader.preloadAll((progress) => {
+		const names = new Set(chatData.dialogue.map(d => d.name));
+		const configuredAvatars = new Set(chatData.avatars.map(a => a.name));
+		const missingNames = [...names].filter(name => !configuredAvatars.has(name));
+		const textureFallback = Assets.get('missing_avatar.png');
+		missingNames.forEach((name) => {
+			PIXI.Assets.cache.set(getAvatarTextureName(name), textureFallback);
+		})
+
+		await AssetLoader.loadRest((progress) => {
 			console.log('loading', progress);
 		});
 	}

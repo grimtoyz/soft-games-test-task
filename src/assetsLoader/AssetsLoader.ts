@@ -1,12 +1,20 @@
 import { Assets } from 'pixi.js';
 import { ASSET_BUNDLES } from '../config/assetsManifest';
+import * as PIXI from "pixi.js";
+import {getAvatarTextureName} from "../helpers/text/TextureNameHelper";
 
 type DynamicAsset = {
 	name: string;
 	url: string;
 };
 
+type Avatar = {
+	name: string;
+	url: string;
+};
+
 export class AssetLoader {
+	private static preloadBundles = new Set<string>();
 	private static registeredBundles = new Set<string>();
 	private static initialized = false;
 
@@ -24,7 +32,7 @@ export class AssetLoader {
 
 		Object.entries(ASSET_BUNDLES).forEach(([bundleName, bundleAssets]) => {
 			Assets.addBundle(bundleName, bundleAssets);
-			this.registeredBundles.add(bundleName);
+			this.preloadBundles.add(bundleName);
 		});
 
 		this.initialized = true;
@@ -34,7 +42,6 @@ export class AssetLoader {
 		const bundle = config.map((asset) => ({
 			alias: this.makeAlias(bundleName, asset.name),
 			src: asset.url,
-			missing: 'missing_image.png',
 			parser: 'loadTextures',
 		}));
 
@@ -42,7 +49,50 @@ export class AssetLoader {
 		this.registeredBundles.add(bundleName);
 	}
 
-	public static async preloadAll(onProgress?: (progress: number) => void): Promise<void> {
+	public static async preloadStatic(onProgress?: (progress: number) => void): Promise<void> {
+		const bundles = Array.from(this.preloadBundles);
+
+		let loaded = 0;
+
+		for (const bundleName of bundles) {
+			await Assets.loadBundle(bundleName);
+
+			loaded++;
+			onProgress?.(loaded / bundles.length);
+		}
+	}
+
+	public static async loadAvatarsSequential(avatars: Avatar[]) {
+		const result: Record<string, PIXI.Texture> = {};
+		const fallbackTexture = PIXI.Assets.get('missing_avatar.png');
+
+		for (const avatar of avatars) {
+			try {
+				const texture = await PIXI.Assets.load({
+					src: avatar.url,
+					parser: 'loadTextures',
+				});
+
+				const avatarTextureAlias = getAvatarTextureName(avatar.name);
+				if (texture) {
+					PIXI.Assets.cache.set(avatarTextureAlias, texture);
+					result[avatar.name] = texture;
+				} else {
+					PIXI.Assets.cache.set(avatarTextureAlias, fallbackTexture);
+					result[avatar.name] = fallbackTexture;
+				}
+			} catch (e) {
+				console.warn(`Avatar failed to load: ${avatar.name.toLowerCase()}`, avatar.url);
+
+				PIXI.Assets.cache.set(`avatars-${avatar.name}`, fallbackTexture);
+				result[avatar.name] = fallbackTexture;
+			}
+		}
+
+		return result;
+	}
+
+	public static async loadRest(onProgress?: (progress: number) => void): Promise<void> {
 		const bundles = Array.from(this.registeredBundles);
 
 		let loaded = 0;
