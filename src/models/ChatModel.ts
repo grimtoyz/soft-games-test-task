@@ -49,9 +49,7 @@ export class ChatModel {
   }
 
   getMessage(index: number): string {
-    const message = this._messages[index].text;
-
-    return message;
+    return this._messages[index].text;
   }
 
   setChatData(data: ChatData) {

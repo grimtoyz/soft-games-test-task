@@ -2,13 +2,9 @@ import { Assets } from 'pixi.js';
 import { ASSET_BUNDLES } from '../config/assetsManifest';
 import * as PIXI from 'pixi.js';
 import { getAvatarTextureName } from '../helpers/text/TextureNameHelper';
+import type { AvatarData } from '../types/types.ts';
 
 type DynamicAsset = {
-  name: string;
-  url: string;
-};
-
-type Avatar = {
   name: string;
   url: string;
 };
@@ -63,7 +59,7 @@ export class AssetLoader {
     }
   }
 
-  public static async loadAvatarsSequential(avatars: Avatar[]) {
+  public static async loadAvatarsSequential(avatars: AvatarData[]) {
     const result: Record<string, PIXI.Texture> = {};
     const fallbackTexture = PIXI.Assets.get('missing_avatar.png');
 
