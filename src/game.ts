@@ -1,165 +1,192 @@
 import * as PIXI from 'pixi.js';
-import {ResizeManager} from "./managers/ResizeManager";
+import { ResizeManager } from './managers/ResizeManager';
 import gameConfig from './config/gameConfig.json';
-import {SceneManager} from "./managers/SceneManager";
-import {AssetLoader} from "./assetsLoader/AssetsLoader";
-import {PersistentUI} from "./view/persistentUI/PersistentUI";
-import {CardsScene} from "./view/scenes/CardsScene";
-import {ChatScene} from "./view/scenes/ChatScene";
-import {FireScene} from "./view/scenes/FireScene";
-import {ChatModel} from "./models/ChatModel";
-import '../styles/fonts.css';
-import {ResizeModel} from "./models/ResizeModel";
-import {getAvatarTextureName} from "./helpers/text/TextureNameHelper";
-import {Assets} from "pixi.js";
+import { SceneManager } from './managers/SceneManager';
+import { AssetLoader } from './assetsLoader/AssetsLoader';
+import { PersistentUI } from './view/persistentUI/PersistentUI';
+import { CardsScene } from './view/scenes/CardsScene';
+import { ChatScene } from './view/scenes/ChatScene';
+import { FireScene } from './view/scenes/FireScene';
+import { ChatModel } from './models/ChatModel';
+// @ts-ignore
+import './styles/fonts.css';
+import { ResizeModel } from './models/ResizeModel';
+import { getAvatarTextureName } from './helpers/text/TextureNameHelper';
+import { Assets } from 'pixi.js';
+import type { ChatData } from './types/types.ts';
 
 const SCENES = {
-	CARDS: 'Ace of Shadows',
-	CHAT: 'Magic Words',
-	FIRE: 'Phoenix Flame'
-}
+  CARDS: 'Ace of Shadows',
+  CHAT: 'Magic Words',
+  FIRE: 'Phoenix Flame',
+};
 
-const SCENES_ORDER = [
-	SCENES.CARDS,
-	SCENES.CHAT,
-	SCENES.FIRE
-]
+const SCENES_ORDER = [SCENES.CARDS, SCENES.CHAT, SCENES.FIRE];
+export type GameServices = {
+  app: PIXI.Application;
+  world: PIXI.Container;
+  rootElement: HTMLElement;
+  eventBus: PIXI.EventEmitter;
+  resizeModel: ResizeModel;
+  chatModel: ChatModel;
+};
+
+export const GAME = {} as GameServices;
 
 export class Game {
-	private _app: PIXI.Application;
-	private _world: PIXI.Container;
-	private _resizeManager: ResizeManager;
-	private _resizeModel: ResizeModel;
-	private _sceneManager: SceneManager;
-	private _eventBus: PIXI.EventEmitter;
-	private _chatModel: ChatModel;
-	readonly _rootElement: HTMLElement;
+  private _app!: PIXI.Application;
+  private _world!: PIXI.Container;
+  private _resizeManager!: ResizeManager;
+  private _resizeModel!: ResizeModel;
+  private _sceneManager!: SceneManager;
+  private _eventBus!: PIXI.EventEmitter;
+  private _chatModel!: ChatModel;
+  readonly _rootElement: HTMLElement;
 
-	constructor() {
-		this._rootElement = document.getElementById('game');
-		if (!this._rootElement) throw new Error('#game container not found');
-	}
+  constructor() {
+    const root = document.getElementById('game');
+    if (!root) {
+      throw new Error('Root element #game not found');
+    }
+    this._rootElement = root;
+    GAME.rootElement = root;
+  }
 
-	public async init(): Promise<any> {
-		this._app = await this._createPixiApp();
-		this._world = new PIXI.Container();
-		this._app.stage.addChild(this._world);
-		this._app.stage.roundPixels = gameConfig.roundPixels;
-		this._app.stage.eventMode = 'static';
+  public async init(): Promise<any> {
+    this._app = await this._createPixiApp();
+    this._world = new PIXI.Container();
+    this._app.stage.addChild(this._world);
+    this._app.stage.eventMode = 'static';
 
-		this._eventBus = new PIXI.EventEmitter<Events>();
+    this._eventBus = new PIXI.EventEmitter();
 
-		await this._loadAssets();
-		await document.fonts.load('40px "DIN Condensed"');
+    GAME.app = this._app;
+    GAME.world = this._world;
+    GAME.eventBus = this._eventBus;
 
-		this._setupManagers();
-		this._setupScenes();
+    this._setupModels();
 
-		// debug resize testing
-		this._createSafeFrame();
+    await AssetLoader.init();
+    await AssetLoader.preloadStatic();
 
-		this._resizeManager.resize();
-	}
+    const chatData: ChatData = await this._loadChatData(gameConfig.chatURL);
+    this._chatModel.setChatData(chatData);
+    this._chatModel.setMessages(chatData.dialogue);
+    this._chatModel.setAvatars(chatData.avatars);
+    this._chatModel.setEmojis(chatData.emojies);
 
-	private async _loadAssets(): Promise<void> {
-		await AssetLoader.init();
+    await this._loadAssets();
+    await document.fonts.load('40px "DIN Condensed"');
 
-		await AssetLoader.preloadStatic();
+    this._setupManagers();
+    this._setupScenes();
 
-		const chatData = await this._loadChatData(gameConfig.chatURL);
-		this._chatModel = new ChatModel();
-		this._chatModel.setMessages(chatData.dialogue);
-		this._chatModel.setAvatars(chatData.avatars);
+    // debug resize testing
+    this._createSafeFrame();
 
-		await AssetLoader.loadAvatarsSequential(chatData.avatars);
-		await AssetLoader.addDynamicBundle(chatData.emojies, 'emojies');
+    this._resizeManager.resize();
+  }
 
-		const names = new Set(chatData.dialogue.map(d => d.name));
-		const configuredAvatars = new Set(chatData.avatars.map(a => a.name));
-		const missingNames = [...names].filter(name => !configuredAvatars.has(name));
-		const textureFallback = Assets.get('missing_avatar.png');
-		missingNames.forEach((name) => {
-			PIXI.Assets.cache.set(getAvatarTextureName(name), textureFallback);
-		})
+  private async _loadAssets(): Promise<void> {
+    await AssetLoader.loadAvatarsSequential(this._chatModel.getAvatars());
+    await AssetLoader.addDynamicBundle(this._chatModel.getEmojis(), 'emojies');
 
-		await AssetLoader.loadRest((progress) => {
-			console.log('loading', progress);
-		});
-	}
+    const chatData = this._chatModel.getChatData();
+    if (!chatData) {
+      throw new Error('no chat data set');
+    }
+    const names = new Set(chatData.dialogue.map((d) => d.name));
+    const configuredAvatars = new Set(chatData.avatars.map((a) => a.name));
+    const missingNames = [...names].filter((name) => !configuredAvatars.has(name));
+    const textureFallback = Assets.get('missing_avatar.png');
+    missingNames.forEach((name) => {
+      PIXI.Assets.cache.set(getAvatarTextureName(name), textureFallback);
+    });
 
-	private async _loadChatData(url: string): Promise<ChatData> {
-		const response = await fetch(url);
+    await AssetLoader.loadRest((progress) => {
+      console.log('loading', progress);
+    });
+  }
 
-		if (!response.ok) {
-			throw new Error(`Failed to load chat data: ${response.status} ${response.statusText}`);
-		}
+  private async _loadChatData(url: string): Promise<ChatData> {
+    const response = await fetch(url);
 
-		return (await response.json() as ChatData);
-	}
+    if (!response.ok) {
+      throw new Error(`Failed to load chat data: ${response.status} ${response.statusText}`);
+    }
 
-	private _setupManagers(): void {
-		const { baseWidth, baseHeight } = gameConfig;
+    return (await response.json()) as ChatData;
+  }
 
-		this._resizeModel = new ResizeModel();
-		this._sceneManager = new SceneManager(this._app, this._world, this._eventBus, this._resizeModel);
+  private _setupModels(): void {
+    this._resizeModel = new ResizeModel();
+    this._chatModel = new ChatModel();
 
-		this._resizeManager = new ResizeManager(
-			this._app,
-			this._eventBus,
-			this._rootElement,
-			this._world,
-			this._resizeModel,
-			baseWidth,
-			baseHeight
-		);
-	}
+    GAME.resizeModel = this._resizeModel;
+    GAME.chatModel = this._chatModel;
+  }
 
-	private _setupScenes(): void {
-		const sceneTitles = [SCENES.CARDS, SCENES.CHAT, SCENES.FIRE];
-		const ui = new PersistentUI(this._app, this._eventBus, this._world, sceneTitles, this.onUIInteract.bind(this));
-		this._sceneManager.addPersistentScene(ui);
+  private _setupManagers(): void {
+    const { baseWidth, baseHeight } = gameConfig;
 
-		const cardsScene = new CardsScene(SCENES.CARDS, this._app, this._resizeModel);
-		this._sceneManager.addScene(cardsScene);
+    this._sceneManager = new SceneManager(GAME);
 
-		const chatScene = new ChatScene(SCENES.CHAT, this._app, this._chatModel, this._resizeModel);
-		this._sceneManager.addScene(chatScene);
+    this._resizeManager = new ResizeManager(GAME, baseWidth, baseHeight);
+  }
 
-		const fireScene = new FireScene(SCENES.FIRE, this._app);
-		this._sceneManager.addScene(fireScene);
-	}
+  private _setupScenes(): void {
+    const sceneTitles = [SCENES.CARDS, SCENES.CHAT, SCENES.FIRE];
+    const ui = new PersistentUI(
+      this._app,
+      this._eventBus,
+      this._world,
+      sceneTitles,
+      this.onUIInteract.bind(this)
+    );
+    this._sceneManager.addPersistentScene(ui);
 
-	private onUIInteract(payload): void {
-		this._sceneManager.switchSceneTo(SCENES_ORDER[payload]);
-	}
+    const cardsScene = new CardsScene(SCENES.CARDS, GAME);
+    this._sceneManager.addScene(cardsScene);
 
-	private _createSafeFrame(): void {
-		const frame = PIXI.Sprite.from('safe_frame');
-		frame.x = gameConfig.baseWidth * 0.5;
-		frame.y = gameConfig.baseHeight * 0.5;
-		frame.anchor.set(0.5);
-		this._world.addChild(frame);
+    const chatScene = new ChatScene(SCENES.CHAT, GAME);
+    this._sceneManager.addScene(chatScene);
 
-		frame.visible = false;
-	}
+    const fireScene = new FireScene(SCENES.FIRE, GAME);
+    this._sceneManager.addScene(fireScene);
+  }
 
-	private async _createPixiApp(): PIXI.Application {
-		const app = new PIXI.Application();
-		globalThis.__PIXI_APP__ = app;
+  private onUIInteract(payload: number): void {
+    this._sceneManager.switchSceneTo(SCENES_ORDER[payload]);
+  }
 
-		await app.init({
-			resizeTo: this._rootElement,
-			width: 800,
-			height: 600,
-			backgroundColor: 0x1099bb,
-		});
+  private _createSafeFrame(): void {
+    const frame = PIXI.Sprite.from('safe_frame');
+    frame.x = gameConfig.baseWidth * 0.5;
+    frame.y = gameConfig.baseHeight * 0.5;
+    frame.anchor.set(0.5);
+    this._world.addChild(frame);
 
-		this._rootElement.appendChild(app.canvas);
+    frame.visible = false;
+  }
 
-		return app;
-	}
+  // @ts-ignore
+  private async _createPixiApp(): PIXI.Application {
+    const app = new PIXI.Application();
 
-	public get app(): PIXI.Application {
-		return this._app;
-	}
+    // PIXI inspector
+    // @ts-ignore
+    globalThis.__PIXI_APP__ = app;
+
+    await app.init({
+      resizeTo: this._rootElement,
+      width: 800,
+      height: 600,
+      backgroundColor: 0x1099bb,
+      roundPixels: gameConfig.roundPixels,
+    });
+
+    this._rootElement.appendChild(app.canvas);
+
+    return app;
+  }
 }
