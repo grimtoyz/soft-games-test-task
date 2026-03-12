@@ -1,17 +1,16 @@
 import * as PIXI from 'pixi.js';
 
 export abstract class GameScene extends PIXI.Container {
-	protected constructor(name: string) {
-		super();
-		this.label = name;
-	}
+  protected constructor(name: string) {
+    super();
+    this.label = name;
+  }
 
-	public onEnter();
+  public onEnter() {}
 
-	public onExit();
+  public onExit() {}
 
-	public update(dt: number): void {
-	}
+  public update(_dt: number): void {}
 
-	onResize(isPortrait: boolean);
+  onResize(_isPortrait: boolean) {}
 }
