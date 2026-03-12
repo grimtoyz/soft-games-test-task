@@ -1,116 +1,107 @@
-import {
-	Sprite,
-	Text,
-	CanvasTextMetrics,
-	TextStyle,
-	Assets
-} from 'pixi.js';
-import {getEmojiTextureName} from "./TextureNameHelper";
+import { Sprite, Text, CanvasTextMetrics, TextStyle, Assets } from 'pixi.js';
+import { getEmojiTextureName } from './TextureNameHelper';
+import type { Token } from './ChatTokensParser.ts';
 
 export function layoutInlineTokens(params: {
-	tokens: Token[];
-	maxWidth: number;
-	textStyle: TextStyle;
-	emojiSize: number;
+  tokens: Token[];
+  maxWidth: number;
+  textStyle: TextStyle;
+  emojiSize: number;
 }) {
-	const { tokens, maxWidth, textStyle, emojiSize } = params;
+  const { tokens, maxWidth, textStyle, emojiSize } = params;
+  const items: { displayObject: Text | Sprite }[] = [];
+  const lineHeight = textStyle.lineHeight ?? CanvasTextMetrics.measureText('Mg', textStyle).height;
 
-	const items: { displayObject: Text | Sprite }[] = [];
+  let x = 0;
+  let y = 0;
+  let maxLineWidth = 0;
 
-	const lineHeight =
-		textStyle.lineHeight ??
-		CanvasTextMetrics.measureText('Mg', textStyle).height;
+  const newLine = () => {
+    maxLineWidth = Math.max(maxLineWidth, x);
+    x = 0;
+    y += lineHeight;
+  };
 
-	let x = 0;
-	let y = 0;
-	let maxLineWidth = 0;
+  for (const token of tokens) {
+    if (token.type === 'newline') {
+      newLine();
+      continue;
+    }
 
-	const newLine = () => {
-		maxLineWidth = Math.max(maxLineWidth, x);
-		x = 0;
-		y += lineHeight;
-	};
+    if (token.type === 'emoji') {
+      const textureName = getEmojiTextureName(token.value);
+      let texture = Assets.get(textureName);
+      if (!texture) {
+        const textureFallback = Assets.get('missing_image.png');
+        Assets.cache.set(textureName, textureFallback);
+        texture = textureFallback;
+      }
 
-	for (const token of tokens) {
-		if (token.type === 'newline') {
-			newLine();
-			continue;
-		}
+      const width = emojiSize;
 
-		if (token.type === 'emoji') {
-			const textureName = getEmojiTextureName(token.value);
-			let texture = Assets.get(textureName);
-			if (!texture) {
-				const textureFallback = Assets.get('missing_image.png');
-			 	Assets.cache.set(textureName, textureFallback);
-				 texture = textureFallback;
-			}
+      if (x > 0 && x + width > maxWidth) {
+        newLine();
+      }
 
-			const width = emojiSize;
+      if (texture) {
+        const sprite = new Sprite(texture);
+        sprite.width = emojiSize;
+        sprite.height = emojiSize;
+        sprite.x = x;
+        sprite.y = y + (lineHeight - emojiSize) / 2;
 
-			if (x > 0 && x + width > maxWidth) {
-				newLine();
-			}
+        items.push({ displayObject: sprite });
+      } else {
+        const fallback = new Text({
+          text: `:${token.value}:`,
+          style: textStyle,
+        });
 
-			if (texture) {
-				const sprite = new Sprite(texture);
-				sprite.width = emojiSize;
-				sprite.height = emojiSize;
-				sprite.x = x;
-				sprite.y = y + (lineHeight - emojiSize) / 2;
+        fallback.x = x;
+        fallback.y = y;
 
-				items.push({ displayObject: sprite });
-			} else {
-				const fallback = new Text({
-					text: `:${token.value}:`,
-					style: textStyle,
-				});
+        items.push({ displayObject: fallback });
+      }
 
-				fallback.x = x;
-				fallback.y = y;
+      x += width;
+      continue;
+    }
 
-				items.push({ displayObject: fallback });
-			}
+    const parts = token.value.match(/\S+|\s+/g) ?? [];
 
-			x += width;
-			continue;
-		}
+    for (const part of parts) {
+      const metrics = CanvasTextMetrics.measureText(part, textStyle);
+      const width = metrics.width;
 
-		const parts = token.value.match(/\S+|\s+/g) ?? [];
+      const isSpace = /^\s+$/.test(part);
 
-		for (const part of parts) {
-			const metrics = CanvasTextMetrics.measureText(part, textStyle);
-			const width = metrics.width;
+      if (x > 0 && !isSpace && x + width > maxWidth) {
+        newLine();
 
-			const isSpace = /^\s+$/.test(part);
+        if (isSpace) {
+          continue;
+        }
+      }
 
-			if (x > 0 && !isSpace && x + width > maxWidth) {
-				newLine();
+      const textNode = new Text({
+        text: part,
+        style: textStyle,
+      });
 
-				if (isSpace) {
-					continue;
-				}
-			}
+      textNode.x = x;
+      textNode.y = y;
 
-			const textNode = new Text({
-				text: part,
-				style: textStyle,
-			});
+      items.push({ displayObject: textNode });
 
-			textNode.x = x;
-			textNode.y = y;
+      x += width;
+    }
+  }
 
-			items.push({ displayObject: textNode });
+  maxLineWidth = Math.max(maxLineWidth, x);
 
-			x += width;
-		}
-	}
-
-	maxLineWidth = Math.max(maxLineWidth, x);
-
-	return {
-		items,
-		width: maxLineWidth,
-		height: y + lineHeight,
-	};
+  return {
+    items,
+    width: maxLineWidth,
+    height: y + lineHeight,
+  };
 }

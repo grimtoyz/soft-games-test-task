@@ -1,5 +1,5 @@
 export const CONSTANTS = {
-	EVENTS: {
-		RESIZE: 'EVENTS:RESIZE'
-	}
-}
+  EVENTS: {
+    RESIZE: 'EVENTS:RESIZE',
+  },
+};
