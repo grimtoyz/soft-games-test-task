@@ -1,46 +1,66 @@
-export interface IMessageData {
-	name: string,
-	text: string
-}
+import type { AvatarData, ChatData, DialogData, EmojiData } from '../types/types.ts';
 
-export interface IAvatarData {
-	name: string,
-	position: string,
-	text: string
+export interface IMessageData {
+  name: string;
+  text: string;
 }
 
 export class ChatModel {
-	private _messages: IMessageData[];
-	private _avatars: IAvatarData[];
+  private _messages: DialogData[];
+  private _emojis: EmojiData[];
+  private _avatars: AvatarData[];
+  private _data: ChatData | null;
 
-	constructor() {
-		this._messages = [];
-		this._avatars = [];
-	}
+  constructor() {
+    this._data = null;
+    this._messages = [];
+    this._emojis = [];
+    this._avatars = [];
+  }
 
-	setAvatars(data: IAvatarData): void {
-		this._avatars = [ ...data ];
-	}
+  setAvatars(data: AvatarData[]): void {
+    this._avatars = data;
+  }
 
-	getAvatarDataByName(name: string): IAvatarData {
-		const avatarData: IAvatarData = this._avatars.find(avatar => {
-			return avatar.name === name;
-		});
+  getAvatars(): AvatarData[] {
+    return this._avatars;
+  }
 
-		return avatarData;
-	}
+  setEmojis(data: EmojiData[]): void {
+    this._emojis = data;
+  }
 
-	setMessages(data: IDialogueMessage[]): void {
-		this._messages = [...data];
-	}
+  getEmojis(): EmojiData[] {
+    return this._emojis;
+  }
 
-	getMessages(): IMessageData[] {
-		return  this._messages;
-	}
+  getAvatarDataByName(name: string): AvatarData | undefined {
+    const avatarData: AvatarData | undefined = this._avatars.find((avatar) => {
+      return avatar.name === name;
+    });
 
-	getMessage(index: number): string {
-		const message = this._messages[index].text;
+    return avatarData;
+  }
 
-		return message
-	}
+  setMessages(data: DialogData[]): void {
+    this._messages = [...data];
+  }
+
+  getMessages(): IMessageData[] {
+    return this._messages;
+  }
+
+  getMessage(index: number): string {
+    const message = this._messages[index].text;
+
+    return message;
+  }
+
+  setChatData(data: ChatData) {
+    this._data = data;
+  }
+
+  getChatData(): ChatData | null {
+    return this._data;
+  }
 }
