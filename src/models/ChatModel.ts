@@ -35,11 +35,9 @@ export class ChatModel {
   }
 
   getAvatarDataByName(name: string): AvatarData | undefined {
-    const avatarData: AvatarData | undefined = this._avatars.find((avatar) => {
+    return this._avatars.find((avatar) => {
       return avatar.name === name;
     });
-
-    return avatarData;
   }
 
   setMessages(data: DialogData[]): void {

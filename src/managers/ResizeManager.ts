@@ -6,12 +6,12 @@ import type { GameServices } from '../game.ts';
 export class ResizeManager {
   private _resizeObserver: ResizeObserver;
   private _app: Application;
-  private _container: HTMLElement;
   private _gameRoot: Container;
   private _resizeModel: ResizeModel;
-  readonly _baseW: number;
-  readonly _baseH: number;
-  readonly _eventBus: EventEmitter;
+  private readonly _container: HTMLElement;
+  private readonly _baseW: number;
+  private readonly _baseH: number;
+  private readonly _eventBus: EventEmitter;
 
   constructor(gameServices: GameServices, baseW: number, baseH: number) {
     this._app = gameServices.app;
