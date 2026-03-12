@@ -4,16 +4,11 @@ import { ChatMessage } from './ChatMessage';
 import magicWordsConfig from '../../../config/scenes/magicWordsConfig.json';
 import { ResizeModel } from '../../../models/ResizeModel';
 import { getAvatarTextureName } from '../../../helpers/text/TextureNameHelper';
-import { AVATAR_POSITIONS, type AvatarPosition } from '../../../enums/enums.ts';
+import { AVATAR_POSITIONS } from '../../../enums/enums.ts';
+import type { AvatarData, AvatarPosition } from '../../../types/types.ts';
 
 interface IMessageData {
   name: string;
-  text: string;
-}
-
-interface IAvatarData {
-  name: string;
-  position: 'left' | 'right';
   text: string;
 }
 
@@ -68,7 +63,7 @@ export class ChatFeed extends Container {
     this._messages = [];
   }
 
-  public async addMessage(message: IMessageData, avatarData: IAvatarData): Promise<void> {
+  public async addMessage(message: IMessageData, avatarData: AvatarData): Promise<void> {
     const { textStyle, maxTextWidth, emojiSize, textOffsetX } = magicWordsConfig.chatBubble;
     const { name, text } = message;
     const avatarPosition: AvatarPosition = avatarData?.position ?? AVATAR_POSITIONS.LEFT;
