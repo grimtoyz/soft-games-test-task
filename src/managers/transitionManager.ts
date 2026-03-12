@@ -1,40 +1,28 @@
-import gsap from "gsap";
+import * as PIXI from 'pixi.js';
+import type { GameScene } from '../view/scenes/GameScene.ts';
+import type { Transition } from '../types/types.ts';
 
 export class TransitionManager {
-	private root!: PIXI.Container;
-	private current: PIXI.Container | null = null;
+  private transitions: Record<string, Transition> = {};
 
-	private transitions: Record<string, Transition> = {};
+  register(name: string, transition: Transition) {
+    this.transitions[name] = transition;
+  }
 
-	init(root: PIXI.Container) {
-		this.root = root;
-	}
+  public async switchSceneTo(
+    from: GameScene,
+    next: GameScene,
+    container: PIXI.Container,
+    type: string = 'fade',
+    duration = 0.5,
+    overlay?: PIXI.Graphics
+  ): Promise<void> {
+    const transition = this.transitions[type];
 
-	register(name: string, transition: Transition) {
-		this.transitions[name] = transition;
-	}
+    if (!transition) throw new Error(`Transition ${type} not found`);
 
-	async switchScenesFromTo(
-		from: PIXI.Container,
-		next: PIXI.Container,
-		type = "fade",
-		duration = 0.5
-	) {
-		const transition = this.transitions[type];
-
-		if (!transition) throw new Error(`Transition ${type} not found`);
-
-		this.root.addChild(next);
-
-		await transition(this.current, next, duration);
-
-		if (this.current) {
-			this.root.removeChild(this.current);
-			this.current.destroy({ children: true });
-		}
-
-		this.current = next;
-	}
+    await transition(from, next, container, duration, overlay);
+  }
 }
 
 export const transitions = new TransitionManager();
