@@ -3,10 +3,12 @@ import gsap from 'gsap';
 import { parseMessageToTokens } from '../../../helpers/text/ChatTokensParser';
 import { layoutInlineTokens } from '../../../helpers/text/LayoutHelper';
 import magicWordsConfig from '../../../config/scenes/magicWordsConfig.json';
+import type { AvatarPosition } from '../../../types/types.ts';
+import { AVATAR_POSITIONS } from '../../../enums/enums.ts';
 
 type ChatMessageViewOptions = {
   avatarTexture: Texture;
-  avatarPosition: 'left' | 'right';
+  avatarPosition: AvatarPosition;
   bubbleTexture: Texture;
   message: string;
 
@@ -83,7 +85,7 @@ export class ChatMessage extends Container {
 
     this._messageContainer = new Container();
 
-    const isLeft = this._avatarPosition === 'left';
+    const isLeft = this._avatarPosition === AVATAR_POSITIONS.LEFT;
     this._bubble = new NineSliceSprite({
       texture: options.bubbleTexture,
       leftWidth: isLeft ? 56 : 40,
@@ -114,9 +116,9 @@ export class ChatMessage extends Container {
       emojiSize: this.emojiSize,
     });
 
-    // TODO: enums instead of strings
-    const isLeft = this._avatarPosition === 'left';
+    const isLeft = this._avatarPosition === AVATAR_POSITIONS.LEFT;
     const bubbleX = isLeft ? this.avatarSize + this.gap : -this.avatarSize - this.gap;
+    // TODO: get rid of magic numbers;
     const bubbleY = -55;
 
     this._messageContainer.x = bubbleX;

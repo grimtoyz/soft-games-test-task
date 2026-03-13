@@ -1,4 +1,4 @@
-import { Container, Graphics, TextStyle, Assets } from 'pixi.js';
+import { Container, Graphics, TextStyle, Assets, Application } from 'pixi.js';
 import gsap from 'gsap';
 import { ChatMessage } from './ChatMessage';
 import magicWordsConfig from '../../../config/scenes/magicWordsConfig.json';
@@ -6,6 +6,7 @@ import { ResizeModel } from '../../../models/ResizeModel';
 import { getAvatarTextureName } from '../../../helpers/text/TextureNameHelper';
 import { AVATAR_POSITIONS } from '../../../enums/enums.ts';
 import type { AvatarData, AvatarPosition } from '../../../types/types.ts';
+import type { GameServices } from '../../../game.ts';
 
 interface IMessageData {
   name: string;
@@ -13,20 +14,22 @@ interface IMessageData {
 }
 
 export class ChatFeed extends Container {
+  private _app: Application;
   private _messages: ChatMessage[];
   private _chatScreenMask!: Graphics;
   private _scrollContainer!: Container;
-  private _chatFeedContainer!: Container;
+  public _chatFeedContainer!: Container;
   private _isPortrait!: boolean;
   private _resizeModel: ResizeModel;
   private _scrollTimeline!: gsap.core.Timeline;
   private _state: { progress: 0 };
 
-  constructor(resizeModel: ResizeModel) {
+  constructor(gameServices: GameServices) {
     super();
 
+    this._app = gameServices.app;
+    this._resizeModel = gameServices.resizeModel;
     this._state = { progress: 0 };
-    this._resizeModel = resizeModel;
     this._messages = [];
 
     this._createView();
@@ -63,7 +66,10 @@ export class ChatFeed extends Container {
     this._messages = [];
   }
 
-  public async addMessage(message: IMessageData, avatarData: AvatarData): Promise<void> {
+  public async addMessage(
+    message: IMessageData,
+    avatarData: AvatarData | undefined
+  ): Promise<void> {
     const { textStyle, maxTextWidth, emojiSize, textOffsetX } = magicWordsConfig.chatBubble;
     const { name, text } = message;
     const avatarPosition: AvatarPosition = avatarData?.position ?? AVATAR_POSITIONS.LEFT;
@@ -95,20 +101,32 @@ export class ChatFeed extends Container {
   public async scroll(): Promise<void> {
     this._state = { progress: 0 };
     this._scrollTimeline = new gsap.core.Timeline({
-      onUpdate: () => this.updateFeedPosition(this._isPortrait),
+      onUpdate: () => {
+        this.updateFeedPosition(this._isPortrait);
+      },
     });
 
-    await this._scrollTimeline.to(this._state, { progress: 1, duration: 1 });
+    await this._scrollTimeline.to(this._state, {
+      progress: 1,
+      duration: 1,
+      onComplete: () => {
+        this._scrollTimeline.kill();
+      },
+    });
   }
 
   public onResize(isPortrait: boolean): void {
     this._isPortrait = isPortrait;
   }
 
-  public updateFeedPosition(isPortrait: boolean): void {
+  public updateFeedPosition(isPortrait: boolean, forceRender: boolean = false): void {
     const { chatFeedWindow } = magicWordsConfig;
     const viewHeight = isPortrait ? chatFeedWindow.port.height : chatFeedWindow.land.height;
 
+    if (forceRender) {
+      this._chatFeedContainer.layout?.forceUpdate();
+      this._app.renderer.render(this._app.stage);
+    }
     this._scrollContainer.position.y = Math.min(
       0,
       viewHeight * 0.5 - this._chatFeedContainer.height
@@ -120,7 +138,7 @@ export class ChatFeed extends Container {
     this._messages.forEach((message) => {
       const maxWidth = isPortrait ? maxTextWidth.port : maxTextWidth.land;
       message.setMaxTextWidth(maxWidth);
-      const isLeft = message.avatarPosition === 'left';
+      const isLeft = message.avatarPosition === AVATAR_POSITIONS.LEFT;
       const xLeft = isPortrait ? messageOffsetX.left.port : messageOffsetX.left.land;
       const xRight = isPortrait ? messageOffsetX.right.port : messageOffsetX.right.land;
       message.position.x = isLeft ? xLeft : xRight;

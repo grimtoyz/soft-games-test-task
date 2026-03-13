@@ -4,14 +4,6 @@ import { Utils } from '../../../utils/Utils.ts';
 import { CONSTANTS } from '../../../constants/constants.ts';
 
 export class Deck extends PIXI.Container {
-  private _cards: Card[];
-
-  constructor() {
-    super();
-
-    this._cards = [];
-  }
-
   public getNextPosition(): PIXI.Point {
     const x = this.children.length * 0.2;
     const y = -this.children.length * 0.2;
@@ -20,7 +12,6 @@ export class Deck extends PIXI.Container {
   }
 
   public addCard(card: Card): void {
-    this._cards.push(card);
     if (card.parent !== this) {
       this.reparentChild(card);
     }
@@ -36,17 +27,11 @@ export class Deck extends PIXI.Container {
       card.x = i * 0.2;
       card.y = -i * 0.2;
       card.angle = -1 + Math.random() * 2;
-
-      this._cards.push(card);
     }
   }
 
-  public reset(): void {
-    this._cards = [];
-  }
-
   public rearrange(): void {
-    this._cards.forEach((card, index) => {
+    this.children.forEach((card, index) => {
       card.x = index * 0.2;
       card.y = -index * 0.2;
       card.scale.set(1);
@@ -54,6 +39,6 @@ export class Deck extends PIXI.Container {
   }
 
   public getTopCard(): Card | undefined {
-    return this._cards.pop();
+    return this.children.pop() as Card;
   }
 }

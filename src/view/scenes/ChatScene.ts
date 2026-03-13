@@ -25,10 +25,10 @@ export class ChatScene extends GameScene {
     this._bg.anchor.set(0.5);
     this.addChild(this._bg);
 
-    this._chatFeedView = new ChatFeed(this._resizeModel);
+    this._chatFeedView = new ChatFeed(gameServices);
     this.addChild(this._chatFeedView);
 
-    this._chatController = new ChatFeedController(this._app, this._chatFeedView, this._chatModel);
+    this._chatController = new ChatFeedController(this._chatFeedView, this._chatModel);
   }
 
   public override onEnter(): void {

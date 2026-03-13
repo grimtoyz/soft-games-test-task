@@ -1,7 +1,5 @@
-import * as PIXI from 'pixi.js';
 import { ChatFeed } from '../view/components/chat/ChatFeed';
 import { ChatModel } from '../models/ChatModel';
-import { Utils } from '../utils/Utils';
 
 interface IMessageData {
   name: string;
@@ -9,13 +7,11 @@ interface IMessageData {
 }
 
 export class ChatFeedController {
-  private _app: PIXI.Application;
   private _view: ChatFeed;
   private _messagesToShow: IMessageData[];
   readonly _chatModel: ChatModel;
 
-  constructor(app: PIXI.Application, view: ChatFeed, chatModel: ChatModel) {
-    this._app = app;
+  constructor(view: ChatFeed, chatModel: ChatModel) {
     this._view = view;
     this._chatModel = chatModel;
     this._messagesToShow = [];
@@ -40,9 +36,9 @@ export class ChatFeedController {
 
   private async showMessage(message: IMessageData): Promise<void> {
     const avatarData = this._chatModel.getAvatarDataByName(message.name);
-    if (!avatarData) {
-      throw new Error('no avatarData found');
-    }
+    // if (!avatarData) {
+    //   throw new Error('no avatarData found');
+    // }
     this._view.addMessage(message, avatarData);
     await this._view.scroll();
   }
@@ -52,8 +48,6 @@ export class ChatFeedController {
     this._view.updateMaxWidth(isPortrait);
     this._view.updateMask(isPortrait);
 
-    await Utils.nextTick(this._app);
-
-    this._view.updateFeedPosition(isPortrait);
+    this._view.updateFeedPosition(isPortrait, true);
   }
 }
