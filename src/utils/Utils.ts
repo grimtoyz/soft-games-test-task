@@ -1,12 +1,4 @@
-import * as PIXI from 'pixi.js';
-
 export const Utils = {
-  nextTick: (app: PIXI.Application): Promise<void> => {
-    return new Promise((resolve) => {
-      app.ticker.addOnce(() => resolve());
-    });
-  },
-
   lerp: (a: number, b: number, t: number): number => {
     return a + (b - a) * t;
   },
